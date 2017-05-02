@@ -5,7 +5,7 @@ import org.scalajs.dom
 import org.scalajs.dom.raw.{HTMLElement, HTMLScriptElement, HTMLStyleElement}
 import tutorial.CssSettings._
 
-import scala.scalajs.{js, LinkingInfo}
+import scala.scalajs.{LinkingInfo, js}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scalacss.ScalatagsCss._
 import scalatags.JsDom.TypedTag

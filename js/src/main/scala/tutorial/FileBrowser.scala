@@ -10,7 +10,7 @@ import scalatags.JsDom.all._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class FileBrowser(remoteFetchPaths: DirPathRef ⇒ Future[Either[LookupError, Seq[PathRef]]],
-                        updateDom:        TypedTag[HTMLElement] => Unit) {
+                        updateDom: TypedTag[HTMLElement] => Unit) {
 
   def setState(state: FileBrowser.State): Unit =
     updateDom(FileBrowser.render(state, path => () => fetchPathsUnder(path)))
@@ -27,7 +27,7 @@ final class FileBrowser(remoteFetchPaths: DirPathRef ⇒ Future[Either[LookupErr
   }
 
   def newState[T](wantedPath: DirPathRef, result: Try[Either[LookupError, T]])(
-      success:                T => FileBrowser.State): FileBrowser.State = {
+    success: T => FileBrowser.State): FileBrowser.State = {
 
     def error(msg: String): FileBrowser.State =
       FileBrowser.Error(msg, () => fetchPathsUnder(wantedPath))
@@ -52,18 +52,21 @@ final class FileBrowser(remoteFetchPaths: DirPathRef ⇒ Future[Either[LookupErr
 }
 
 object FileBrowser {
+
   sealed trait State {
     def pathOpt: Option[PathRef] =
       this match {
         case AtDir(path, _) => Some(path)
-        case Error(_, _)    => None
-        case Loading        => None
+        case Error(_, _) => None
+        case Loading => None
       }
   }
 
   case object Loading extends State
+
   case class AtDir(path: DirPathRef, dirContents: Seq[PathRef]) extends State
-  case class Error(msg:  String, retry:        () => Unit)   extends State
+
+  case class Error(msg: String, retry: () => Unit) extends State
 
   def render(state: FileBrowser.State, fetchDir: DirPathRef => () => Unit): TypedTag[HTMLElement] =
     state match {
@@ -73,7 +76,7 @@ object FileBrowser {
           Styles.myStyle,
           div(
             `class` := "panel-heading",
-            h1("Currently browsing", path.toString),
+            h1("Currently browsing: ", path.toString),
             div(
               `class` := "btn-toolbar",
               state.pathOpt
@@ -88,18 +91,20 @@ object FileBrowser {
               `class` := "list-group",
               div(
                 refs.collect {
-                  case dir @ DirRef(parent, dirName) ⇒
+                  case dir@DirRef(parent, dirName) ⇒
                     button(dirName,
-                           `type` := "button",
-                           `class` := "list-group-item",
-                           onclick := fetchDir(dir))
+                      `type` := "button",
+                      `class` := "list-group-item",
+                      onclick := fetchDir(dir))
                 },
                 refs.collect {
-                  case file @ FileRef(parent, fileName) ⇒
+                  case file@FileRef(parent, fileName, size, filetype) ⇒
                     a(
                       `class` := "list-group-item",
                       span(`class` := "glyphicon glyphicon-file"),
-                      fileName,
+                      span(fileName),
+                      span(`class` := "badge", size / 1024 + " KB"),
+                      span(`class` := "badge bg-info", filetype),
                       cursor := "pointer"
                     )
                 }

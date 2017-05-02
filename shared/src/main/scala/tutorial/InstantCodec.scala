@@ -9,6 +9,8 @@ import upickle.default
   * These needs to be in scope to use `Instant` with upickle (json) and autowire
   */
 object InstantCodec {
+  import InstantCodec._
+
   implicit val InstantReader: default.Reader[Instant] =
     upickle.default.makeReader{
       case Str(str) => Instant.ofEpochMilli(str.toLong)

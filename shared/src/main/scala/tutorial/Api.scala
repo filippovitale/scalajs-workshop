@@ -33,7 +33,7 @@ sealed trait PathRef {
 sealed trait DirPathRef extends PathRef
 
 final case class DirRef(parent:  DirPathRef, name: String) extends DirPathRef
-final case class FileRef(parent: DirPathRef, name: String) extends PathRef
+final case class FileRef(parent: DirPathRef, name: String, size: Long, `type`: String) extends PathRef
 
 case object RootRef extends DirPathRef {
   val name = "/"
